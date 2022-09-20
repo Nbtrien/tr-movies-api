@@ -42,3 +42,5 @@ Route::post('login', 'Api\AuthController@login');
 Route::post('register', 'Api\AuthController@register');
 Route::post('checkemail', 'Api\AuthController@checkEmail');
 
+// test
+Route::get('/', 'Api\MovieController@test');

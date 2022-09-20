@@ -331,4 +331,13 @@ class MovieController extends Controller
     {
         //
     }
+
+    // test api
+    public function test()
+    {
+        //
+        return response()->json([
+                'data' => "Ok"
+        ]);
+    }
 }
