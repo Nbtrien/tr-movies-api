@@ -9,8 +9,10 @@ use EpisodeController;
 
 class VideoController extends Controller
 {
+    // get video by movie id
     public function getVideobyMovieId(Request $request)
     {
+        // get request
         $movie_id = $request->id;
         $movie = Movie::find($movie_id);
 
@@ -26,7 +28,9 @@ class VideoController extends Controller
         //     ]);
         // }
 
+        // check is feature movie
         if ($movie->category->name == 'phim lẻ') {
+            // get video from feature movies 
             $video = $movie->featuremovies->video;
             $url['url'] = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
             return response()->json([
@@ -34,10 +38,14 @@ class VideoController extends Controller
             ]);
         } else
         {
+            // is series movie
+            
+            // get episode   from seriesmovies
             $episode = Episode::where('seriesmovie_id',$movie->seriesmovies->id)
                                 ->orderBy('updated_at', 'asc')
                                 ->first();
             // $video = $episode->video ?: null;
+            // get video from episode
             if ($episode) {
                 $video = $episode->video;
                 $url['url'] = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
@@ -61,6 +69,7 @@ class VideoController extends Controller
         ]);
     }
 
+    // get video id by episode
     public function getVideoIdbyEpisode(Request $request){
         $movie_id = $request->id;
         $ep = $request->episode;

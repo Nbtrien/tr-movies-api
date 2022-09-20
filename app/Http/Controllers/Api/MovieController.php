@@ -26,16 +26,22 @@ class MovieController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    // get movies by request
     public function getList(Request $request)
     {
+        // get request 
         $request->keyword = $request->keyword ?: 'updated_at';
         $request->orderby = $request->orderby ?: 'desc';
         $limit = $request->limit ?: 12;
 
+        // get by category
         $request->category ? $category = Categories::select('id')->where('name', '=', $request->category)->first() :  $category = null;
+        // get by country
         $request->country ? $country = Country::select('id')->where('name', '=', $request->country)->first() :  $country = null;
+        
+        // get by genre
         $genre = $request->genre ?: null;
-
         if ($genre) {
             $genre_id = Genre::select('id')->where('name', '=', $genre)->first();
             $genre_id ? $genreinmovies = GenreinMovie::select('movie_id')->where('genre_id', $genre_id->id)->get() : $genreinmovies = null;
@@ -48,6 +54,7 @@ class MovieController extends Controller
 
         if (!isset($movies_id))  $movies_id = null;
 
+        // get movies
         $movies = Movie::where(function ($query) use($category, $country, $movies_id){
             if ($category) 
                 $query->where('category_id', $category->id);
@@ -62,19 +69,23 @@ class MovieController extends Controller
         return MovieResource::collection($movies);
     }
 
+    // get movies by actor
     public function getMoviesbyActor(Request $request) {
+        // get request
         $request->keyword = $request->keyword ?: 'updated_at';
         $request->orderby = $request->orderby ?: 'desc';
         $limit = $request->limit ?: 12;
-
         $actor_id = $request->id;
+
+        // get movies id by actor id
         $actor_id ? $actorinmovies = ActorinMovie::select('movie_id')->where('actor_id', $actor_id)->get() : $actorinmovies = null;
         $actor_id ? $movies_id = $actorinmovies->map(function ($actorinmovie) {
                 return $actorinmovie->movie_id;
             })->reject(function ($name) {
                 return empty($name);
             }) : $movies_id = [];
-
+        
+        // get movies by movies id
         $movies = Movie::where(function ($query) use($movies_id){
         if ($movies_id !== null) 
             $query->whereIn('id', $movies_id);
@@ -85,35 +96,43 @@ class MovieController extends Controller
         return MovieResource::collection($movies);
     }
 
+    // get movies by name or key(search)
     public function getMoviesbyName(Request $request){
+        // get request
         $key = $request->key;
         $limit = $request->limit ?: 12;
+        // get movies by key
         $movies = Movie::where('name', 'like', '%' . $key . '%')->orWhere('eng_name', 'like', '%' . $key . '%')->paginate($limit);
         return MovieResource::collection($movies);
     }
 
+    // get similar movies
     public function similarMovies(Request $request)
     {
+        // get request
         $id = $request->id;
-
         $limit = 12;
+
+        // get movie in tag by movie id
         $movie_tags = MovieinTag::where('movie_id', '=', $id)->get();
         $tags = array();
 
         if ($movie_tags) 
         {
+            // get tags from movies in tag
             foreach ($movie_tags as $movie_tag) 
             {
                 $tags[] = $movie_tag->tag_id;
             }
 
+            // get movies by tags
             $movies = Movie::whereHas('movieintags', function ($q) use ($tags) {
                 return $q->whereIn('tag_id', $tags); 
             })
             ->where('id', '!=', $id)
             ->take($limit)
             ->get(['id','name','eng_name','profileimage_id','coverimage_id']);
-        
+            
             foreach ($movies as $movie) {
                 $movie->profileimage->only(['id', 'image_url']);
                 $movie->coverimage->only(['id', 'image_url']);
@@ -121,30 +140,40 @@ class MovieController extends Controller
             }
         }
 
-        $movie = Movie::find($id);
-        $seriesList = array();
+        // $movie = Movie::find($id);
+        // $seriesList = array();
         
         return MovieResource::collection($movies);
 
     }
 
+    // get movie in series
     public function sameSeries(Request $request)
     {
+        // get request
         $id = $request->id;
         $limit = 12;
         
+        // find movie by id
         $movie = Movie::find($id);
         $seriesList = [];
+
+        // check is moveie in series
         if(count($movie->movieinseries) != 0){
             $i = 0;
+            // Loop through series movies
             foreach ($movie->movieinseries as $movieinserie) {
+                // get series from movies in series
                 $series_id = $movieinserie->series_id;
                 $series = Series::find($series_id);
 
+                // get movies id from movies in series
                 $listmovie_id = array();
                 foreach ($series->movieinseries as $movieinserie1) {
                     $listmovie_id[] = $movieinserie1->movie_id;
                 }
+
+                // get movies from movies id
                 $relatedmovies = Movie::whereIn('id', $listmovie_id)
                 ->where('id', '!=', $id)
                 ->take($limit)
@@ -192,6 +221,7 @@ class MovieController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+    // get movie by id
     public function show($id)
     {
         $movie = Movie::findOrFail($id);

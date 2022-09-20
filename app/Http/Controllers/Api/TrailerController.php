@@ -8,7 +8,7 @@ use App\Models\{Movie,Trailer};
 
 class TrailerController extends Controller
 {
-    //
+    // get trailer by movie id
     public function getTrailerbyMovieId($id)
     {
         $movie = Movie::findOrFail($id);
