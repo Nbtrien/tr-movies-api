@@ -23,6 +23,9 @@
         "nunomaduro/collision": "^4.3",
         "phpunit/phpunit": "^8.5.8|^9.3.3"
     },
+    "replace": {
+        "lcobucci/jwt": "*"
+    },
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
