@@ -250,6 +250,7 @@ class MovieController extends Controller
         ->get();
 
         $directorinmovies = DirectorinMovie::select('director_id')->where('movie_id', $id)->get();
+        // 
 
         $directors_id = $directorinmovies->map(function ($directorinmovie) {
             return $directorinmovie->director_id;
