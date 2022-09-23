@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-// use App\Models\DirectorinMovie;
+use App\Models\DirectorinMovie;
 use App\Models\{Movie, Image, Trailer, Country, Categories, Genre, GenreinMovie, Actor, ActorinMovie, 
     Director, Episode, MovieinTag, Tag, MovieinSeries, Series};
 use App\Http\Resources\MovieResource as MovieResource;
