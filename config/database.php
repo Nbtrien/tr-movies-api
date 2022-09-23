@@ -70,7 +70,7 @@ return [
         ],
 
         'pgsql' => [
-            'driver'   => 'pgsql',
+        'driver'   => 'pgsql',
         'host'     => $host,
         'database' => $database,
         'username' => $username,
