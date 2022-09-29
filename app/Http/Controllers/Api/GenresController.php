@@ -22,11 +22,10 @@ class GenresController extends Controller
         $limit = $request->limit ?: 12;
 
         $genres = Genre::orderBy($request->keyword, $request->orderby)
-        ->paginate($limit)
-        ->get();
-        return response()->json([
+        ->paginate($limit);
+        return response()->json(
             $genres
-        ]);
+        );
     }
 
     /**
