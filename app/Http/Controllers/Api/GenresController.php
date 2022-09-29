@@ -24,7 +24,7 @@ class GenresController extends Controller
         $genres = Genre::orderBy($request->keyword, $request->orderby)
         ->paginate($limit);
         return response()->json([
-            'data' => $genres
+            $genres
         ]);
     }
 
