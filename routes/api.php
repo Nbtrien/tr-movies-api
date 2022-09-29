@@ -37,6 +37,8 @@ Route::get('episodes/{id}', 'Api\EpisodeController@getEpisodesbyMovie'); // get 
 
 Route::get('actor/{id}', 'Api\ActorController@getActorbyId'); // get actor by id
 
+Route::get('genres', 'Api\GenresController@index'); // get genres
+
 // Authenticate
 Route::post('login', 'Api\AuthController@login');
 Route::post('register', 'Api\AuthController@register');
