@@ -16,18 +16,6 @@ class VideoController extends Controller
         $movie_id = $request->id;
         $movie = Movie::find($movie_id);
 
-        // if ($movie->featuremovies) {
-        //     return response()->json([
-        //         'movie' => $movie,
-        //         'f' => $movie->featuremovies
-        //     ]);
-        // } else {
-        //     return response()->json([
-        //         'movie' => $movie,
-        //         's' => $movie->seriesmovies
-        //     ]);
-        // }
-
         // check is feature movie
         if ($movie->category->name == 'phim lẻ') {
             // get video from feature movies 
