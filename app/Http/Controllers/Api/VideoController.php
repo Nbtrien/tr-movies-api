@@ -13,16 +13,17 @@ class VideoController extends Controller
     public function getVideobyMovieId(Request $request)
     {
         // get request
-        $movie_id = $request->id;
+        $movie_id = $request->movie_id;
         $movie = Movie::find($movie_id);
 
         // check is feature movie
         if ($movie->category->name == 'phim lẻ') {
             // get video from feature movies 
             $video = $movie->featuremovies->video;
-            $url['url'] = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
+            $video->video_url = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
             return response()->json([
-                'data' => $url
+                'id' => $video->id, 
+                'video_url' => $video->video_url,
             ]);
         } else
         {
@@ -36,30 +37,32 @@ class VideoController extends Controller
             // get video from episode
             if ($episode) {
                 $video = $episode->video;
-                $url['url'] = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
+                $video->video_url = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
             } else {
-                $url['url'] = null;
+                $video->video_url = null;
             }
             return response()->json([
-                'data' => $url
-            ]);                   
+                'id' => $video->id, 
+                'video_url' => $video->video_url,
+            ]);                 
         }
     }
 
     // Get video by id
     public function getVideobyId(Request $request)
     {
-        $id = $request->id;
-        $video = Video::find($id);
-        $url['url'] = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
-        return response()->json([
-            'data' => $url
-        ]);
+        $id = $request->video_id;
+        $video = Video::select('id','video_url')->find($id);
+        $video->video_url = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
+        
+        return response()->json(
+            $video
+        );
     }
 
     // get video id by episode
     public function getVideoIdbyEpisode(Request $request){
-        $movie_id = $request->id;
+        $movie_id = $request->movie_id;
         $ep = $request->episode;
         $seriesmovie = Seriesmovie::where('movie_id', $movie_id)->first();
 
@@ -67,9 +70,25 @@ class VideoController extends Controller
                             ->where('episode', $ep) 
                             ->first();
         $video_id = $episode->video_id;
-        $video['video_id'] = $video_id;
-        return response()->json([
-            'data' => $video
-        ]);
+        $video['id'] = $video_id;
+        return response()->json(
+            $video
+        );
     }
+
+        // get video by episode
+        public function getVideobyEpisode(Request $request){
+            $movie_id = $request->movie_id;
+            $ep = $request->episode;
+            $seriesmovie = Seriesmovie::where('movie_id', $movie_id)->first();
+    
+            $episode = Episode::where('seriesmovie_id', $seriesmovie->id)
+                                ->where('episode', $ep) 
+                                ->first();
+            $video = $episode->video;
+            return response()->json([
+                'id' => $video->id, 
+                'video_url' => $video->video_url,
+            ]);   
+        }
 }

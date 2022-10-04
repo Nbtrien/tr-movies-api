@@ -76,7 +76,7 @@ class MovieController extends Controller
         $request->keyword = $request->keyword ?: 'updated_at';
         $request->orderby = $request->orderby ?: 'desc';
         $limit = $request->limit ?: 12;
-        $actor_id = $request->id;
+        $actor_id = $request->actor_id;
 
         // get movies id by actor id
         $actor_id ? $actorinmovies = ActorinMovie::select('movie_id')->where('actor_id', $actor_id)->get() : $actorinmovies = null;
@@ -111,7 +111,7 @@ class MovieController extends Controller
     public function similarMovies(Request $request)
     {
         // get request
-        $id = $request->id;
+        $id = $request->movie_id;
         $limit = 12;
 
         // get movie in tag by movie id
@@ -152,7 +152,7 @@ class MovieController extends Controller
     public function sameSeries(Request $request)
     {
         // get request
-        $id = $request->id;
+        $id = $request->movie_id;
         $limit = 12;
         
         // find movie by id
@@ -223,10 +223,10 @@ class MovieController extends Controller
      * @return \Illuminate\Http\Response
      */
     // get movie by id
-    public function show($id)
+    public function show($movie_id)
     {
-        $movie = Movie::findOrFail($id);
-        $genreinmovies = GenreinMovie::select('genre_id')->where('movie_id', $id)->get();
+        $movie = Movie::findOrFail($movie_id);
+        $genreinmovies = GenreinMovie::select('genre_id')->where('movie_id', $movie_id)->get();
 
         $genres_id = $genreinmovies->map(function ($genreinmovie) {
             return $genreinmovie->genre_id;
@@ -238,7 +238,7 @@ class MovieController extends Controller
         ->whereIn('id', $genres_id)
         ->get();
 
-        $actorinmovies = ActorinMovie::select('actor_id')->where('movie_id', $id)->get();
+        $actorinmovies = ActorinMovie::select('actor_id')->where('movie_id', $movie_id)->get();
 
         $casts_id = $actorinmovies->map(function ($actorinmovie) {
             return $actorinmovie->actor_id;
@@ -250,7 +250,7 @@ class MovieController extends Controller
         ->whereIn('id', $casts_id)
         ->get();
 
-        $directorinmovies = DirectorinMovie::select('director_id')->where('movie_id', $id)->get();
+        $directorinmovies = DirectorinMovie::select('director_id')->where('movie_id', $movie_id)->get();
 
         $directors_id = $directorinmovies->map(function ($directorinmovie) {
             return $directorinmovie->director_id;
@@ -273,7 +273,6 @@ class MovieController extends Controller
                 ->first();
             }
         }
-
         return response()->json([
             'id' => $movie->id, 
             'name' => $movie->name,

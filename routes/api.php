@@ -18,22 +18,46 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+// Route::get('movies', 'Api\MovieController@getList'); //get all movies
+// Route::get('movie/{id}', 'Api\MovieController@show'); //get movie by id
+// Route::get('movies/similarmovies/{id}', 'Api\MovieController@similarMovies'); // get similar movie by movie id
+// Route::get('movies/sameseries/{id}', 'Api\MovieController@sameSeries'); // get series movie by 
+// Route::get('movies/search/{key}', 'Api\MovieController@getMoviesbyName'); //get movie by key
+// Route::get('movies/actor/{id}', 'Api\MovieController@getMoviesbyActor'); // get movie by actor
 Route::get('movies', 'Api\MovieController@getList'); //get all movies
-Route::get('movie/{id}', 'Api\MovieController@show'); //get movie by id
-Route::get('movies/similarmovies/{id}', 'Api\MovieController@similarMovies'); // get similar movie by movie id
-Route::get('movies/sameseries/{id}', 'Api\MovieController@sameSeries'); // get series movie by 
-Route::get('movies/search/{key}', 'Api\MovieController@getMoviesbyName'); //get movie by key
-Route::get('movies/actor/{id}', 'Api\MovieController@getMoviesbyActor'); // get movie by actor
+Route::get('movie/{movie_id}', 'Api\MovieController@show'); //get movie by id
+Route::get('movie/{movie_id}/similar', 'Api\MovieController@similarMovies'); // get similar movie by movie id
+Route::get('movie/{movie_id}/sameseries', 'Api\MovieController@sameSeries'); // get series movie by 
+Route::get('search/movie/{key}', 'Api\MovieController@getMoviesbyName'); //get movie by key
+Route::get('actor/{actor_id}/movies', 'Api\MovieController@getMoviesbyActor'); // get movie by actor
 
-Route::get('trailer/{id}', 'Api\TrailerController@getTrailerbyMovieId'); // get trailer by movie id
+// Incomplete
+Route::get('movie/{movie_id}/series', 'Api\SeriesController@index');
 
-Route::get('video/{id}', 'Api\VideoController@getVideobyId'); // get video by id
-Route::get('video/movie/{id}', 'Api\VideoController@getVideobyMovieId'); // get video by movie id
-Route::get('video/movie/{id}/{episode}', 'Api\VideoController@getVideoIdbyEpisode'); //get get video id by episode
+// Route::get('trailer/{id}', 'Api\TrailerController@getTrailerbyMovieId'); // get trailer by movie id
 
-Route::get('comments/{id}', 'Api\CommentController@commentsbyMovieId'); // get comments by movie id
+// Route::get('video/{id}', 'Api\VideoController@getVideobyId'); // get video by id
+// Route::get('video/movie/{id}', 'Api\VideoController@getVideobyMovieId'); // get video by movie id
+// Route::get('video/movie/{id}/{episode}', 'Api\VideoController@getVideoIdbyEpisode'); //get get video id by episode
 
-Route::get('episodes/{id}', 'Api\EpisodeController@getEpisodesbyMovie'); // get episodes by movie id
+// Route::get('comments/{id}', 'Api\CommentController@commentsbyMovieId'); // get comments by movie id
+
+// Route::get('episodes/{id}', 'Api\EpisodeController@getEpisodesbyMovie'); // get episodes by movie id
+
+// Route::get('actor/{id}', 'Api\ActorController@getActorbyId'); // get actor by id
+
+// Route::get('genres', 'Api\GenresController@index'); // get genres
+
+Route::get('movie/{movie_id}/trailer', 'Api\TrailerController@getTrailerbyMovieId'); // get trailer by movie id
+
+Route::get('video/{video_id}', 'Api\VideoController@getVideobyId'); // get video by id
+Route::get('movie/{movie_id}/video', 'Api\VideoController@getVideobyMovieId'); // get video by movie id
+Route::get('movie/{movie_id}/episode/{episode}/video_id', 'Api\VideoController@getVideoIdbyEpisode'); //get get video id by episode
+Route::get('movie/{movie_id}/episode/{episode}/video', 'Api\VideoController@getVideobyEpisode'); //get get video by episode
+
+Route::get('movie/{movie_id}/comments', 'Api\CommentController@commentsbyMovieId'); // get comments by movie id
+
+Route::get('movie/{movie_id}/episodes', 'Api\EpisodeController@getEpisodesbyMovie'); // get episodes by movie id
 
 Route::get('actor/{id}', 'Api\ActorController@getActorbyId'); // get actor by id
 

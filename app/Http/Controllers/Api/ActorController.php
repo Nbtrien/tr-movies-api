@@ -15,8 +15,8 @@ class ActorController extends Controller
             $actor = Actor::find($id);
             $actor->image;
             $data['actor'] = $actor;
-            return response()->json([
-                'data' => $actor
-            ]);
+            return response()->json(
+                $actor
+            );
         }
 }

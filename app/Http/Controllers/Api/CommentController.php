@@ -48,7 +48,7 @@ class CommentController extends Controller
     // get comments by movie id
     public function commentsbyMovieId(Request $request) {
         // get request
-        $movie_id = $request->id;
+        $movie_id = $request->movie_id;
         $limit = $request->limit ?: 12;
 
         // get comments

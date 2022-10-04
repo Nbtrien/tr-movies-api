@@ -13,14 +13,14 @@ class EpisodeController extends Controller
     public function getEpisodesbyMovie(Request $request)
     {
         // get request
-        $movie_id = $request->id;
+        $movie_id = $request->movie_id;
         $current_episode = $request->ep ?: null;
 
         // get series movie by movie id
         $seriesmovie = Seriesmovie::where('movie_id', $movie_id)->first();
 
         // get episodes by series
-        $episodes = Episode::select('id', 'episode')
+        $episodes = Episode::select('id', 'episode', 'title')
         ->where('seriesmovie_id', $seriesmovie->id)
         ->get();
 

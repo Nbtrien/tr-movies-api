@@ -9,14 +9,14 @@ use App\Models\{Movie,Trailer};
 class TrailerController extends Controller
 {
     // get trailer by movie id
-    public function getTrailerbyMovieId($id)
+    public function getTrailerbyMovieId($movie_id)
     {
-        $movie = Movie::findOrFail($id);
+        $movie = Movie::findOrFail($movie_id);
         $trailer = $movie->trailer;
-        $url['url'] = 'http://localhost/Laravel Projects/webmovies/public/Videos/'.$trailer->trailer_url;
-        return response()->json([
-            'data' => $url
-        ]);
+        $trailer->trailer_url = 'http://localhost/Laravel%20Projects/webmovies/public/Videos/'.$trailer->trailer_url;
+        return response()->json(
+            $trailer
+        );
         
     }
 }
