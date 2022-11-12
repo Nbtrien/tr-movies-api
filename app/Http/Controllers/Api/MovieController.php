@@ -195,6 +195,23 @@ class MovieController extends Controller
 
     }
 
+    public function getMoviesbySeries(Request $request)
+    {   
+        $series_id = $request->series_id;
+        $series = Series::select('id')->find($series_id);
+        $movies = [];
+        foreach ($series->movieinseries as $movieinserie) {
+            $movies[] = $movieinserie->movie;
+        }
+
+        foreach ($movies as $movie) {
+            $movie->profileimage->only(['id', 'image_url']);
+            $movie->coverimage->only(['id', 'image_url']);
+        }
+
+        return MovieResource::collection($movies);
+    }
+
     /**
      * Show the form for creating a new resource.
      *

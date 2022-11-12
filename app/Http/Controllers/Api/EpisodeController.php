@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\{Movie, Episode, Seriesmovie };
+use App\Models\{Movie, Episode, Seriesmovie, Image };
 
 class EpisodeController extends Controller
 {
@@ -20,9 +20,12 @@ class EpisodeController extends Controller
         $seriesmovie = Seriesmovie::where('movie_id', $movie_id)->first();
 
         // get episodes by series
-        $episodes = Episode::select('id', 'episode', 'title')
-        ->where('seriesmovie_id', $seriesmovie->id)
+        $episodes = Episode::where('seriesmovie_id', $seriesmovie->id)
         ->get();
+
+        foreach ($episodes as $episode) {
+            $episode->image;
+        }
 
         return response()->json([
             'episode' => $current_episode,

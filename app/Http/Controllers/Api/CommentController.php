@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
 use App\Models\{Movie, Comment};
+use App\Http\Resources\CommentResource;
 
 class CommentController extends Controller
 {
@@ -78,8 +79,9 @@ class CommentController extends Controller
         }
         // $data['title'] = 'data';
         // $data['comment'] = 
-        return response()->json(
-            $comments
-        );
+        // return response()->json(
+        //     $comments
+        // );
+        return CommentResource::collection($comments);
     }
 }

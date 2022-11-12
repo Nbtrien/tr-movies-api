@@ -30,23 +30,10 @@ Route::get('movie/{movie_id}/similar', 'Api\MovieController@similarMovies'); // 
 Route::get('movie/{movie_id}/sameseries', 'Api\MovieController@sameSeries'); // get series movie by 
 Route::get('search/movie/{key}', 'Api\MovieController@getMoviesbyName'); //get movie by key
 Route::get('actor/{actor_id}/movies', 'Api\MovieController@getMoviesbyActor'); // get movie by actor
+Route::get('series/{series_id}/movies', 'Api\MovieController@getMoviesbySeries'); // get movies by series
 
 // Incomplete
 Route::get('movie/{movie_id}/series', 'Api\SeriesController@index');
-
-// Route::get('trailer/{id}', 'Api\TrailerController@getTrailerbyMovieId'); // get trailer by movie id
-
-// Route::get('video/{id}', 'Api\VideoController@getVideobyId'); // get video by id
-// Route::get('video/movie/{id}', 'Api\VideoController@getVideobyMovieId'); // get video by movie id
-// Route::get('video/movie/{id}/{episode}', 'Api\VideoController@getVideoIdbyEpisode'); //get get video id by episode
-
-// Route::get('comments/{id}', 'Api\CommentController@commentsbyMovieId'); // get comments by movie id
-
-// Route::get('episodes/{id}', 'Api\EpisodeController@getEpisodesbyMovie'); // get episodes by movie id
-
-// Route::get('actor/{id}', 'Api\ActorController@getActorbyId'); // get actor by id
-
-// Route::get('genres', 'Api\GenresController@index'); // get genres
 
 Route::get('movie/{movie_id}/trailer', 'Api\TrailerController@getTrailerbyMovieId'); // get trailer by movie id
 
@@ -60,8 +47,12 @@ Route::get('movie/{movie_id}/comments', 'Api\CommentController@commentsbyMovieId
 Route::get('movie/{movie_id}/episodes', 'Api\EpisodeController@getEpisodesbyMovie'); // get episodes by movie id
 
 Route::get('actor/{id}', 'Api\ActorController@getActorbyId'); // get actor by id
+Route::get('movie/{movie_id}/actors', 'Api\ActorController@getActorsbyMovie'); // get actor by id
 
 Route::get('genres', 'Api\GenresController@index'); // get genres
+
+Route::get('series', 'Api\SeriesController@index'); //get series
+Route::get('movie/{movie_id}/series', 'Api\SeriesController@getSeriesbymovie'); //get series
 
 // Authenticate
 Route::post('login', 'Api\AuthController@login');

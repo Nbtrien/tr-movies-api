@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\{Series, Movie}; 
 
 class SeriesController extends Controller
 {
@@ -12,10 +13,40 @@ class SeriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    // get series by movie_id
-    public function index()
+    // get series 
+    public function index(Request $request)
     {
-        //
+        $request->keyword = $request->keyword ?: 'updated_at';
+        $request->orderby = $request->orderby ?: 'desc';
+        if ($limit = $request->limit) {
+            $series = Series::orderBy($request->keyword, $request->orderby)
+            ->paginate($limit);
+            foreach ($variable as $key => $value) {
+                # code...
+            }
+            // return response()->json(
+            //     $series
+            // );
+            
+        } else {
+            $series = Series::orderBy($request->keyword, $request->orderby)->get();
+            return response()->json([
+                "data" => $series
+            ]);
+        }
+    }
+
+    public function getSeriesbyMovie(Request $request) {
+        $movie_id = $request->movie_id;
+        $movie = Movie::select('id')->find($movie_id);
+        $movieinseries = [];
+        foreach ($movie->movieinseries as $movieinserie) {
+            $series[] = $movieinserie->series;
+        }
+
+        return response()->json([
+            "data" => $series
+        ]);
     }
 
     /**
