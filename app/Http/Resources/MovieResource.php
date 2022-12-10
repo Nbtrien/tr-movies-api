@@ -16,6 +16,12 @@ class MovieResource extends JsonResource
     public function toArray($request)
     {
         // return parent::toArray($request);
+        $genres = [];
+        foreach ($this->genreinmovies as $genreinmovie) {
+            $genres[] = $genreinmovie->genre;
+           
+        }
+
         return [
             'id' => $this->id,    
             'name' => $this->name,
@@ -28,6 +34,8 @@ class MovieResource extends JsonResource
             'avgrating' => $this->avgrating,
             'view' => $this->view,
             'category_id' => $this->category_id,
+            'category' => $this->category->name,
+            'genres' => $genres,
             'country_id' => $this->country_id,
             'profileimage' => Image::find($this->profileimage_id)->image_url,
             'coverimage' => Image::find($this->coverimage_id)->image_url

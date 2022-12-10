@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Middleware;
-
+use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Closure;
 
@@ -24,17 +24,24 @@ class JWTMiddleware
 
         } catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
             $message = 'Token expired';
+            $status_code = 401;
+            
         } catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) 
         {
             $message = 'Invalid token';
+            $status_code = 403;
         } catch (\Tymon\JWTAuth\Exceptions\JWTException  $e) 
         {
             $message = 'provide token';
+            $status_code = 401;
         }
+
+        $token = JWTAuth::getToken() ? JWTAuth::getToken()->get() : null;
 
         return response()->json([
             'status' => false,
-            'message' => $message
-        ]);
+            'message' => $message,
+            'token' => $token,
+        ], $status_code);
     }
 }

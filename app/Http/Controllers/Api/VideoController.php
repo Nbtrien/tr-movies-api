@@ -15,6 +15,8 @@ class VideoController extends Controller
         // get request
         $movie_id = $request->movie_id;
         $movie = Movie::find($movie_id);
+        $movie->view = $movie->view + 1;
+        $movie->save();
 
         // check is feature movie
         if ($movie->category->name == 'phim lẻ') {

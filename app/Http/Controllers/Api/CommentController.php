@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Validator;
 use App\Models\{Movie, Comment};
 use App\Http\Resources\CommentResource;
 
@@ -71,7 +71,8 @@ class CommentController extends Controller
             if ($replies) {
                 foreach ($replies as $reply) {
                     // custome time
-                    $reply["time"] = $this->customeTime(strtotime($reply["created_at"])) && $reply->user;
+                    $reply["time"] = $this->customeTime(strtotime($reply["created_at"]));
+                    $reply->user;
                 }
             }
             
@@ -83,5 +84,42 @@ class CommentController extends Controller
         //     $comments
         // );
         return CommentResource::collection($comments);
+    }
+
+    // Save Comment
+    public function store(Request $request) {
+
+
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
+            'content' => 'bail|required|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response([
+                'status' => false,
+                'message' => $validator->errors()
+            ]);
+        }
+        
+        $comment = new Comment;
+        $comment->user_id = $request->user_id;
+        $comment->movie_id = $request->movie_id;
+        $comment->content = $request->content;
+        $comment->parent_id = $request->parent_id;
+        if ($comment->save()) 
+        {
+            return response()->json([
+                'status' => true,
+                'message' => "Succsessful"
+            ]);
+        }
+        else{
+            return response()->json([
+                'status' => false,
+                'message' => "failed"
+            ]);
+        }
     }
 }

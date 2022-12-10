@@ -11,9 +11,11 @@
         "php": "^8.0",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
+        "google/apiclient": "^2.12",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.0",
         "laravel/tinker": "^2.5",
+        "nao-pon/flysystem-google-drive": "~1.1",
         "orangehill/iseed": "^3.0",
         "tymon/jwt-auth": "^1.0"
     },

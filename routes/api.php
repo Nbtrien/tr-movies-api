@@ -46,10 +46,17 @@ Route::get('movie/{movie_id}/comments', 'Api\CommentController@commentsbyMovieId
 
 Route::get('movie/{movie_id}/episodes', 'Api\EpisodeController@getEpisodesbyMovie'); // get episodes by movie id
 
+Route::get('actors', 'Api\ActorController@index'); // get actors
 Route::get('actor/{id}', 'Api\ActorController@getActorbyId'); // get actor by id
-Route::get('movie/{movie_id}/actors', 'Api\ActorController@getActorsbyMovie'); // get actor by id
+Route::get('movie/{movie_id}/actors', 'Api\ActorController@getActorsbyMovie'); // get actor by movie
 
 Route::get('genres', 'Api\GenresController@index'); // get genres
+
+Route::get('categories', 'Api\CategoryController@index'); // get categories
+
+Route::get('countries', 'Api\CountryController@index'); // get countries
+
+Route::get('tags', 'Api\TagController@index'); // get tags
 
 Route::get('series', 'Api\SeriesController@index'); //get series
 Route::get('movie/{movie_id}/series', 'Api\SeriesController@getSeriesbymovie'); //get series
@@ -58,6 +65,43 @@ Route::get('movie/{movie_id}/series', 'Api\SeriesController@getSeriesbymovie'); 
 Route::post('login', 'Api\AuthController@login');
 Route::post('register', 'Api\AuthController@register');
 Route::post('checkemail', 'Api\AuthController@checkEmail');
+
+
+Route::group(['middleware' => ['jwt.verify']], function() {
+    Route::post('logout', 'Api\AuthController@logout');
+    Route::post('refresh', 'Api\AuthController@refresh');
+    Route::post('check_token', 'Api\AuthController@checktoken');
+
+    Route::post('comments', 'Api\CommentController@store');
+    Route::post('usermovies', 'Api\UserMovieController@store'); //store movie by user
+    Route::put('usermovies', 'Api\UserMovieController@destroy'); //delete movie by user
+
+    Route::get('user/{user_id}/movies', 'Api\MovieController@getMoviesbyUser'); // get movies by user
+    Route::get('user/{user_id}/movie/{movie_id}', 'Api\UserMovieController@checkMoviebyUser'); // get movies by user
+
+
+    // admin
+    Route::get('users', 'Api\AuthController@index'); //get users
+    Route::post('movies', 'Api\MovieController@store'); // store movie
+    Route::post('actors', 'Api\ActorController@store'); // store actor
+    Route::post('genres', 'Api\GenresController@store'); // store genres
+    Route::post('tags', 'Api\TagController@store'); // store tags
+    Route::post('episodes', 'Api\EpisodeController@store'); // store episodes
+    Route::post('actor-in-movies', 'Api\ActorinMovieController@store'); // store actor-in-movie
+    Route::post('series', 'Api\SeriesController@store'); // store series
+    Route::post('rating', 'Api\RatingController@store'); // store series
+
+    // put
+    Route::put('tag/{tag_id}', 'Api\TagController@update'); // update tags
+    Route::put('genres/{genres_id}', 'Api\GenresController@update'); // update genres
+
+    // delete
+    Route::delete('genres', 'Api\GenresController@destroy'); // delete genres
+    Route::delete('tags', 'Api\TagController@destroy'); // delete tags
+
+});
+
+
 
 // test
 Route::get('/', 'Api\MovieController@test');

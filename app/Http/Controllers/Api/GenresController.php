@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\{Movie, Image, Trailer, Country, Categories, Genre, GenreinMovie, Actor, ActorinMovie, 
@@ -54,6 +54,18 @@ class GenresController extends Controller
         //
     }
 
+    public function storeFiletoDrive($file){
+        $name = time().'.' . explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
+
+        $disk = Storage::disk('google')->put($name, file_get_contents($file));
+
+        $gcs = Storage::disk('google');
+        $url = $gcs->url($name);
+
+
+        return $url;
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -62,7 +74,24 @@ class GenresController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $genre = new Genre;
+
+        $imagestore = $request->get('image')['file'];
+        $image_url = $this->storeFiletoDrive($imagestore);
+
+        $image = new Image;
+        $image->image_url = $image_url;
+        $image->save();
+        $image_id = $image->id;
+
+        $genre->name = $request->name;
+        $genre->image_id = $image_id;
+
+        $result = $genre->save();
+
+        return response()->json([
+            'status' => $result
+        ]);
     }
 
     /**
@@ -96,7 +125,22 @@ class GenresController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $genres = Genre::find($id);
+        if ($request->get('image')) {
+            $imagestore = $request->get('image')['file'];
+            $image_url = $this->storeFiletoDrive($imagestore);
+
+            $image = Image::find($genres->image_id);
+            $image->image_url = $image_url;
+            $image->save();
+        }
+
+        $genres->name = $request->name;
+        $result = $genres->save();
+
+        return response()->json([
+            'status' => $result
+        ]);
     }
 
     /**
@@ -105,8 +149,16 @@ class GenresController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        //
+        $genres_id = $request->id;
+
+        foreach ($genres_id as $id) {
+            $genres = Genre::find($id);
+            $genres->delete();
+        }
+        return response()->json([
+            'status' => true
+        ]);
     }
 }

@@ -19,8 +19,8 @@ class MovieinTag extends Model
     }
 
     // Get the series that owns the movie in series.
-    public function series()
+    public function tag()
     {
-        return $this->belongsTo('App\Models\Series');
+        return $this->belongsTo('App\Models\Tag');
     }
 }

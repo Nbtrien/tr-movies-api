@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{Series, Movie}; 
+use App\Models\{Series, Movie, MovieinSeries}; 
 
 class SeriesController extends Controller
 {
@@ -30,8 +30,22 @@ class SeriesController extends Controller
             
         } else {
             $series = Series::orderBy($request->keyword, $request->orderby)->get();
+            $datas = [];
+
+            foreach ($series as $serie) {
+                $movies = [];
+                foreach ($serie->movieinseries as $movieinserie) {
+                    $movie = collect($movieinserie->movie)->only('id','name', 'view');
+                    $movies[] = $movie;
+                }
+                $data = collect($serie)->except('movieinseries');
+                $data['movies'] = $movies;
+                $datas[] = $data;
+            }
+
+
             return response()->json([
-                "data" => $series
+                "data" => $datas
             ]);
         }
     }
@@ -67,7 +81,25 @@ class SeriesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $series = new Series;
+        $series->name = $request->name;
+        if($series->save()){
+            $series_id = $series->id;
+            $movies = $request->movies;
+            foreach ($movies as $movie) 
+            {
+                $movieinseries = new MovieinSeries;
+                $movieinseries->movie_id = $movie;
+                $movieinseries->series_id = $series_id;
+                $movieinseries->save();
+            }
+            return response()->json([
+                'status' => true
+            ]);
+        }
+        return response()->json([
+            'status' => false
+        ]);
     }
 
     /**

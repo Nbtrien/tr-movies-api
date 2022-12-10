@@ -1,13 +1,14 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use Storage;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\DirectorinMovie;
-use App\Models\{Movie, Image, Trailer, Country, Categories, Genre, GenreinMovie, Actor, ActorinMovie, 
-    Director, Episode, MovieinTag, Tag, MovieinSeries, Series};
+use App\Models\{Movie, Image, Trailer, Video, Country, Categories, Genre, GenreinMovie, Actor, ActorinMovie, 
+    Director, Episode, MovieinTag, Tag, MovieinSeries, Series,SeriesMovie, DirectorinMovie, Featuremovie};
+use App\User;
 use App\Http\Resources\MovieResource as MovieResource;
+use App\Http\Resources\AppResource;
 use Illuminate\Support\Collection;
 
 class MovieController extends Controller
@@ -34,7 +35,7 @@ class MovieController extends Controller
         // get request 
         $request->keyword = $request->keyword ?: 'updated_at';
         $request->orderby = $request->orderby ?: 'desc';
-        $limit = $request->limit ?: 12;
+       
 
         // get by category
         $request->category ? $category = Categories::select('id')->where('name', '=', $request->category)->first() :  $category = null;
@@ -55,17 +56,31 @@ class MovieController extends Controller
 
         if (!isset($movies_id))  $movies_id = null;
 
-        // get movies
-        $movies = Movie::where(function ($query) use($category, $country, $movies_id){
-            if ($category) 
-                $query->where('category_id', $category->id);
-            if ($country) 
-                $query->where('country_id', $country->id);
-            if ($movies_id !== null) 
-                $query->whereIn('id', $movies_id);
-        })
-        ->orderBy($request->keyword, $request->orderby)
-        ->paginate($limit);
+        if ($request->limit == 0) {
+            $movies = Movie::where(function ($query) use($category, $country, $movies_id){
+                if ($category) 
+                    $query->where('category_id', $category->id);
+                if ($country) 
+                    $query->where('country_id', $country->id);
+                if ($movies_id !== null) 
+                    $query->whereIn('id', $movies_id);
+            })
+            ->orderBy($request->keyword, $request->orderby)
+            ->get();
+        } else {
+            $limit = $request->limit ?: 12;
+            // get movies
+            $movies = Movie::where(function ($query) use($category, $country, $movies_id){
+                if ($category) 
+                    $query->where('category_id', $category->id);
+                if ($country) 
+                    $query->where('country_id', $country->id);
+                if ($movies_id !== null) 
+                    $query->whereIn('id', $movies_id);
+            })
+            ->orderBy($request->keyword, $request->orderby)
+            ->paginate($limit);
+        }
 
         return MovieResource::collection($movies);
     }
@@ -132,7 +147,7 @@ class MovieController extends Controller
             })
             ->where('id', '!=', $id)
             ->take($limit)
-            ->get(['id','name','eng_name','profileimage_id','coverimage_id']);
+            ->get();
             
             foreach ($movies as $movie) {
                 $movie->profileimage->only(['id', 'image_url']);
@@ -178,7 +193,7 @@ class MovieController extends Controller
                 $relatedmovies = Movie::whereIn('id', $listmovie_id)
                 ->where('id', '!=', $id)
                 ->take($limit)
-                ->get(['id','name','eng_name','profileimage_id','coverimage_id']);
+                ->get();
                 foreach ($relatedmovies as $relatedmovie) {
                     $relatedmovie->profileimage->only(['id', 'image_url']);
                     $relatedmovie->coverimage->only(['id', 'image_url']);
@@ -212,6 +227,20 @@ class MovieController extends Controller
         return MovieResource::collection($movies);
     }
 
+    public function getMoviesbyUser(Request $request){
+        $user_id = $request->user_id;
+        $user = User::find($user_id);
+
+        $usermovies = $user->usermovies;
+
+        $movies = [];
+        foreach ($usermovies as $usermovie) {
+            $movies[] = $usermovie->movie;
+        }
+
+        return MovieResource::collection($movies);
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -230,7 +259,107 @@ class MovieController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $movie = new Movie;
+
+        $profileimage = $request->get('profileimage')['file'];
+        $profileimage_url = $this->storeFiletoDrive($profileimage);
+
+        $coverimage = $request->get('coverimage')['file'];
+        $coverimage_url = $this->storeFiletoDrive($coverimage);
+
+        $imagepro = new Image;
+        $imagepro->image_url = $profileimage_url;
+        $imagepro->save();
+        $profileimage_id = $imagepro->id;
+
+        $imagecov = new Image;
+        $imagecov->image_url = $coverimage_url;
+        $imagecov->save();
+        $coverimage_id = $imagecov->id;
+
+        $trailer = new Trailer;
+        $trailer->trailer_url = $request->trailer;
+        $trailer->save();
+        $trailer_id = $trailer->id;
+
+        if(isset($request->video))
+        {
+            $video = new Video;
+            $video->video_url = $request->video;
+            $video->save();
+            $video_id = $video->id;
+        }
+        
+        $movie->name = $request->name;
+        $movie->eng_name = $request->engName;
+        $movie->description = $request->description;
+        $movie->language = $request->language;
+        $movie->studio = $request->studio;
+        $movie->releasedate = $request->release_date;
+        $movie->runtime = $request->runTime;
+        $movie->category_id = $request->category;
+        $movie->country_id = $request->country;
+        $movie->profileimage_id = $profileimage_id;
+        $movie->coverimage_id = $coverimage_id;
+        $movie->trailer_id = $trailer_id;
+
+        $result = $movie->save();
+        $movie_id = $movie->id;
+        
+        $genres = $request->genres;
+        foreach ($genres as $genre) 
+        {
+            $genreinmovie = new GenreinMovie;
+            $genreinmovie->movie_id = $movie_id;
+            $genreinmovie->genre_id = $genre;
+            $genreinmovie->save();
+        }
+
+        if ($request->tags) 
+        {
+            $tags = $request->tags;
+            foreach ($tags as $tag) 
+            {
+                $movieintag = new MovieinTag;
+                $movieintag->movie_id = $movie_id;
+                $movieintag->tag_id = $tag;
+                $movieintag->save();
+            }
+        }
+
+        if($movie->category->name == 'phim lẻ')
+        {
+            $featuremovie = new Featuremovie;
+            $featuremovie->movie_id = $movie_id;
+            $featuremovie->category_id = $request->category;
+            $featuremovie->video_id = $video_id;
+            $featuremovie->save();
+        }
+        else 
+        {
+            $seriesmovie = new SeriesMovie;
+            $seriesmovie->movie_id = $movie_id;
+            $seriesmovie->category_id = $request->category;
+            $seriesmovie->episodes = $request->episodes;
+            $seriesmovie->save();
+        }
+
+        return response()->json([
+            'status' => $result
+        ]);
+
+    }
+
+    public function storeFiletoDrive($file){
+        $name = time().'.' . explode('/', explode(':', substr($file, 0, strpos($file, ';')))[1])[1];
+
+        $disk = Storage::disk('google')->put($name, file_get_contents($file));
+
+        $gcs = Storage::disk('google');
+        $url = $gcs->url($name);
+
+
+        return $url;
     }
 
     /**
@@ -290,6 +419,14 @@ class MovieController extends Controller
                 ->first();
             }
         }
+
+        
+        $tags = [];
+        foreach ($movie->movieintags as $movieintag) {
+            $tags[] = $movieintag->tag;
+           
+        }
+
         return response()->json([
             'id' => $movie->id, 
             'name' => $movie->name,
@@ -310,6 +447,7 @@ class MovieController extends Controller
             'genres' => $genres,
             'casts' => $casts,
             'directors' => $directors,
+            'tags' => $tags,
             'newepisode' => isset($newepisode->episode) ? $newepisode->episode : 0,
             'episodes' => isset($movie->seriesmovies->episodes) ? $movie->seriesmovies->episodes : null
         ]);
