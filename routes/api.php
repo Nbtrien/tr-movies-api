@@ -43,6 +43,7 @@ Route::get('movie/{movie_id}/episode/{episode}/video_id', 'Api\VideoController@g
 Route::get('movie/{movie_id}/episode/{episode}/video', 'Api\VideoController@getVideobyEpisode'); //get get video by episode
 
 Route::get('movie/{movie_id}/comments', 'Api\CommentController@commentsbyMovieId'); // get comments by movie id
+Route::get('comments', 'Api\CommentController@index'); // get comments by movie id
 
 Route::get('movie/{movie_id}/episodes', 'Api\EpisodeController@getEpisodesbyMovie'); // get episodes by movie id
 
@@ -98,7 +99,7 @@ Route::group(['middleware' => ['jwt.verify']], function() {
     // delete
     Route::delete('genres', 'Api\GenresController@destroy'); // delete genres
     Route::delete('tags', 'Api\TagController@destroy'); // delete tags
-
+    Route::delete('comment/{comment_id}', 'Api\CommentController@destroy'); // delete tags
 });
 
 

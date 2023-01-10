@@ -46,6 +46,33 @@ class CommentController extends Controller
         return $time;
     }
 
+    public function index(Request $request)
+    {
+        $comments = Comment::orderBy('movie_id')->get();
+
+        foreach ($comments as $comment) {
+            $comment->user;
+            // custome time 
+            $datetime2 = strtotime($comment["created_at"]);
+
+            $comment["time"] = $this->customeTime($datetime2);
+
+            // get reply comments
+            $replies = Comment::where('parent_id', $comment->id)->get();
+            if ($replies) {
+                foreach ($replies as $reply) {
+                    // custome time
+                    $reply["time"] = $this->customeTime(strtotime($reply["created_at"]));
+                    $reply->user;
+                }
+            }
+            
+            $comment["replies"] = $replies ?: null;
+        }
+
+        return CommentResource::collection($comments);
+    }
+
     // get comments by movie id
     public function commentsbyMovieId(Request $request) {
         // get request
@@ -121,5 +148,14 @@ class CommentController extends Controller
                 'message' => "failed"
             ]);
         }
+    }
+
+    public function destroy($id)
+    {
+        $comment = Comment::find($id);
+        $result = $comment->delete();
+        return response()->json([
+            'status' => $result
+        ]);
     }
 }
