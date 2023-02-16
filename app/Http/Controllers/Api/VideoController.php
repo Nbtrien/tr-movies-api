@@ -22,7 +22,7 @@ class VideoController extends Controller
         if ($movie->category->name == 'phim lẻ') {
             // get video from feature movies 
             $video = $movie->featuremovies->video;
-            $video->video_url = 'http://192.168.1.6/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
+            $video->video_url = 'http://172.20.10.2/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
             return response()->json([
                 'id' => $video->id, 
                 'video_url' => $video->video_url,
@@ -39,7 +39,7 @@ class VideoController extends Controller
             // get video from episode
             if ($episode) {
                 $video = $episode->video;
-                $video->video_url = 'http://192.168.1.6/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
+                $video->video_url = 'http://172.20.10.2/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
             } else {
                 $video->video_url = null;
             }
@@ -55,7 +55,7 @@ class VideoController extends Controller
     {
         $id = $request->video_id;
         $video = Video::select('id','video_url')->find($id);
-        $video->video_url = 'http://192.168.1.6/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
+        $video->video_url = 'http://172.20.10.2/Laravel Projects/webmovies/public/Videos/'.$video->video_url;
         
         return response()->json(
             $video
