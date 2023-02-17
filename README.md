@@ -21,6 +21,6 @@ A movie APP Restful API using Laravel API Resource (Laravel Version 8.0, PHP ver
 ![Routes](https://github.com/Nbtrien/tr-movies-api/blob/main/assets/img/routes.png)
 ![Routes](https://github.com/Nbtrien/tr-movies-api/blob/main/assets/img/routes1.png)
 
-### Database Preview
+## Database Preview
 
 ![Database Preview](https://github.com/Nbtrien/tr-movies-api/blob/main/assets/img/data.png)
