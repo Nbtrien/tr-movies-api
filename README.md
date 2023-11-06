@@ -1,4 +1,4 @@
-## Movie API With Laravel
+# Movie API With Laravel
 
 A movie APP Restful API using Laravel API Resource (Laravel Version 8.0, PHP version 8.0).
 
